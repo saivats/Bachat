@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BACHAT // SYSTEM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  
+  <div class="cyber-overlay"></div>
+  
+  <div class="app-container">
+    
+    <!-- Sidebar / Nav -->
+    <nav class="sidebar cyber-panel">
+      <div class="brand">
+        <h1>BACHAT<span class="glitch" data-text="SYS">SYS</span></h1>
+      </div>
+      
+      <div class="user-profile glow-border" id="userProfile" onclick="openProfileModal()">
+        <div class="avatar" id="userAvatar">X</div>
+        <div class="user-info">
+          <h3 id="userNameDisplay">OPERATIVE</h3>
+          <p id="userCityDisplay">SECTOR</p>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li class="active"><a href="#dashboard">[01] DASHBOARD</a></li>
+        <li><a href="#" onclick="openBudgetModal()">[02] SET OVERRIDE BUDGET</a></li>
+        <li><a href="#" onclick="openExpenseModal()" class="action-highlight">[+] INJECT NEW LOG</a></li>
+      </ul>
+
+      <div class="budget-card glow-border" id="budgetCard">
+        <h3>MONTHLY CAP</h3>
+        <p class="budget-amount">₹<span id="budgetDisplay">0.00</span></p>
+        <div class="progress-bar">
+          <div class="progress" id="budgetProgress"></div>
+        </div>
+        <p class="budget-status" id="budgetStatusText">0% CONSUMED</p>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- Top Stats -->
+      <section class="top-stats">
+        <div class="stat-box cyber-panel glow-border">
+          <p>TOTAL BURN</p>
+          <h2 id="totalSpentDisplay" class="neon-text blue">₹0.00</h2>
+        </div>
+        <div class="stat-box cyber-panel glow-border">
+          <p>REMAINING FUNDS</p>
+          <h2 id="remainingDisplay" class="neon-text green">₹0.00</h2>
+        </div>
+        <div class="stat-box cyber-panel glow-border">
+          <p>PRIMARY DRAIN (TOP CAT)</p>
+          <h2 id="topCategoryDisplay" class="neon-text purple">--</h2>
+        </div>
+        <div class="stat-box cyber-panel glow-border warning-box" id="warningBox" style="display: none;">
+          <p class="alert-label">SYS_ALERT</p>
+          <h2 id="warningText" class="alert-text">CAPACITY CRITICAL</h2>
+        </div>
+      </section>
+
+      <!-- Dashboard Grid -->
+      <section class="dashboard-grid">
+        
+        <!-- Expense List -->
+        <div class="expense-list cyber-panel glow-border">
+          <div class="section-header">
+            <h2>TRANSACTION_LOGS</h2>
+            <div class="header-actions">
+              <input type="text" id="searchInput" placeholder="Search parameters..." class="cyber-input-sm" onkeyup="filterExpenses()">
+              <button class="cyber-btn-sm" onclick="exportCSV()">EXPORT.CSV</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table id="expensesTable">
+              <thead>
+                <tr>
+                  <th>TIMESTAMP</th>
+                  <th>TAG</th>
+                  <th>DATA</th>
+                  <th>CREDITS</th>
+                  <th>CMD</th>
+                </tr>
+              </thead>
+              <tbody id="expensesBody">
+                <!-- Rows injected via JS -->
+              </tbody>
+            </table>
+            <div id="emptyState" class="empty-state" style="display:none;">
+              <p>NO DATA NODES DETECTED.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Insights Chart -->
+        <div class="insights cyber-panel glow-border">
+          <h2>SECTOR ANALYSIS</h2>
+          <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- User Profile Modal -->
+  <div class="modal" id="profileModal">
+    <div class="cyber-modal glow-border">
+      <span class="close" onclick="closeModals()">&times;</span>
+      <h2>UPDATE // OPERATIVE</h2>
+      <form id="profileForm">
+        <div class="input-group">
+          <label>N_ID</label>
+          <input type="text" id="inputName" class="cyber-input" required>
+        </div>
+        <div class="input-group">
+          <label>SECTOR</label>
+          <input type="text" id="inputCity" class="cyber-input" required>
+        </div>
+        <button type="submit" class="cyber-btn">EXECUTE</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Budget Modal -->
+  <div class="modal" id="budgetModal">
+    <div class="cyber-modal glow-border">
+      <span class="close" onclick="closeModals()">&times;</span>
+      <h2>SYSTEM // BUDGET OVERRIDE</h2>
+      <form id="budgetForm">
+        <div class="input-group">
+          <label>CREDIT_CAP</label>
+          <input type="number" step="0.01" id="inputBudget" class="cyber-input" required>
+        </div>
+        <button type="submit" class="cyber-btn">EXECUTE</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Expense Modal -->
+  <div class="modal" id="expenseModal">
+    <div class="cyber-modal glow-border">
+      <span class="close" onclick="closeModals()">&times;</span>
+      <h2>INJECT // NEW LOG</h2>
+      <form id="expenseForm">
+        <div class="input-group">
+          <label>AMOUNT</label>
+          <input type="number" step="0.01" id="expAmount" class="cyber-input" required>
+        </div>
+        <div class="input-group">
+          <label>TAG</label>
+          <select id="expCategory" class="cyber-input" required>
+            <option value="Food">Food</option>
+            <option value="Travel">Travel</option>
+            <option value="Education">Education</option>
+            <option value="Hardware">Hardware</option>
+            <option value="Software">Software</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>TIMESTAMP</label>
+          <input type="date" id="expDate" class="cyber-input" required>
+        </div>
+        <div class="input-group">
+          <label>DATA_NOTE</label>
+          <input type="text" id="expDesc" class="cyber-input" placeholder="...">
+        </div>
+        <button type="submit" class="cyber-btn">TRANSMIT</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
